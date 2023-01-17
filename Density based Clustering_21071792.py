@@ -20,11 +20,11 @@ def read_csv(file_name):
     file = pd.read_csv(file_name)
     dataFr = pd.DataFrame(file)
     print(dataFr.isnull().any().any())
-    sort_data = dataFr.iloc[0:200,[1, 22, 34, 45]]
+    sort_data = dataFr.iloc[0:800,[5, 17, 29, 40]]
     return sort_data
 
 
-def cluster_plot():
+def cluster_plot(xlab, ylab, ti):
     
     #Getting the data loaded from csv file
     plot_data = read_csv("Sales_Transactions_Dataset_Weekly.csv")
@@ -42,25 +42,31 @@ def cluster_plot():
     
 
     #KNN method
-    nearest_neigh = NearestNeighbors(n_neighbors = 3).fit(plot_data) 
+    nearest_neigh = NearestNeighbors(n_neighbors = 5).fit(plot_data) 
     neighbor_dist, neighbor_index = nearest_neigh.kneighbors(plot_data)
     neighbor_dist = np.sort(neighbor_dist, axis = 0)
-    neighbor_dist = neighbor_dist[:, 3]
-    print(neighbor_dist)
+    neighbor_dist = neighbor_dist[:, 4]
     plt.figure(figsize = (5,3))
     plt.plot(neighbor_dist)
-    plt.savefig("line plot.png")
+    plt.savefig("line plot.png", dpi = 300)
     
     
     #Cluster plotting
     minPoints = 2*(len(plot_data.axes[1]))
+    
     dbscan = DBSCAN(eps = 0.15, min_samples = minPoints).fit(plot_data)
-    set(dbscan.labels_)
+    labels = dbscan.labels_
     
     plt.figure()
-    plt.scatter(plot_data[:, 0],plot_data[:, 1])
+    plt.title(ti)
+    plt.scatter(x, y, label = labels, c = 'blue', cmap='jet')
+    plt.xlabel(xlab)
+    plt.ylabel(ylab)
+    plt.legend()
+    plt.savefig("scatter Plot.png", dpi = 300)
+    
     return
 
 
 #calling the function to plot the distance.
-cluster_plot()
+cluster_plot('X', 'Y', 'Sales Transactions Weekly')
